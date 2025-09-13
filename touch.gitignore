@@ -1,0 +1,29 @@
+# --- General Python and IDE files ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE-specific files (VS Code)
+.vscode/
+
+# Jupyter/Colab Notebook-specific files
+.ipynb_checkpoints/
+
+# --- Data and Models (Crucial for ML) ---
+# Ignore trained models and model checkpoints
+*.h5
+*.pkl
+*.pth
+*.pt
+*.onnx
+
+# --- Logs and other temporary files ---
+# Log files
+*.log
+
+# Miscellaneous temporary files
+*.tmp
