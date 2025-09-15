@@ -4,6 +4,11 @@ This project trains a **Generative Adversarial Network (GAN)** using PyTorch to 
 
 ---
 
+# 🤝  Project Collaborators
+- Aadesh Borse
+- Shlok Jhawar
+- Vansh Jain
+
 ## 📂 Project Structure
 weather-gan/
 │── weather_gan.py
@@ -34,3 +39,7 @@ Optional GPU: install PyTorch with CUDA for faster training.
 python -m venv venv
 source venv/bin/activate   # Mac/Linux
 venv\Scripts\activate      # Windows
+
+
+
+
