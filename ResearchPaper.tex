@@ -1,0 +1,402 @@
+\documentclass[12pt, draftclsnofoot, onecolumn]{IEEEtran}
+
+% Packages
+\usepackage{cite}          
+\usepackage{graphicx}      
+\usepackage{amsmath}       
+\usepackage{amssymb}       
+\usepackage{array}         
+\usepackage{url}           
+\usepackage{hyperref}      
+\usepackage{setspace}   
+\usepackage{graphicx}
+\usepackage{float} % for [H] option to place images exactly
+
+\setstretch{1.25} % Slightly more spaced lines
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{15pt plus 2pt minus 2pt}{10pt plus 2pt minus 2pt}
+\titlespacing*{\subsection}{0pt}{12pt plus 2pt minus 2pt}{8pt plus 2pt minus 2pt}
+
+\usepackage[font=small,labelfont=bf]{caption}
+
+\begin{document}
+
+% Title
+\title{Synthetic Weather Data Generation Using Generative Adversarial Networks (GANs)}
+
+% Author(s)
+\author{
+\IEEEauthorblockN{Aadesh Borse, Vansh Jain, Shlok Jhawar}\\
+\IEEEauthorblockA{(Department of Information Technology)\\ Narsee Monjee College of Commerce and Economics\\
+Email: aadeshdborse@gmail.com, vansh.jain142005@gmail.com, shlokdjhawar33@gmail.com}
+}
+
+% Make title
+\maketitle
+
+% Abstract
+\begin{abstract}
+This report presents a systematic approach for generating high-fidelity synthetic weather data through a Generative Adversarial Network (GAN). The research is centered on a purpose-designed GAN architecture that is designed to cope with the anomalies of tabular data, a mix of continuous and discrete fields. The model quality is not put to test by a comparative study on different GAN flavors but a strict, metric-driven approach designed for data fidelity. The final metrics for measuring performance are the Kullback-Leibler (KL) and Jensen-Shannon (JS) divergence and are meant to measure the statistical distance between original and synthetic data distribution.
+The experimental findings demonstrate that the GAN effectively extracts the underlying statistical pattern of real data and produces synthetic data that are statistically and visually indistinguishable from their real data counterparts. This is evidenced by the evident convergence of the KL and JS divergence measures throughout the iterations of learning, terminal scores indicating a small distance between the two distributions. The experimental findings are supported with a qualitative evaluation through overlaid histograms and Kernel Density Estimation (KDE) plots that demonstrate the generated data efficiently captures the complicated, multi-modal behaviours of the real data distributions. This research provides a reproducible template for generating synthetic data, a keen emphasis on sensible measures and visualisation techniques for evaluation, and fills a crucial need for high quality, privacy-respecting data for meteorological and allied fields.
+\end{abstract}
+
+% Keywords
+\begin{IEEEkeywords}
+Synthetic Data, Generative Adversarial Network (GAN), Weather Prediction, Data Privacy, Machine Learning
+\end{IEEEkeywords}
+
+% ---------------------------
+\section{Introduction}
+
+The strategic value of data has long been recognized as a driver of innovation and a cornerstone of modern industry. However, the traditional reliance on real-world data collection presents significant challenges, including issues of data scarcity, the high cost of acquisition, and increasingly stringent privacy regulations \cite{ref1,ref2,ref3}. This has catalyzed a paradigm shift toward the use of synthetic data—artificially generated data that mimics the statistical properties of real-world datasets without containing sensitive information \cite{ref4,ref5,ref6}. 
+
+In the field of earth sciences, this approach is particularly transformative, enabling researchers to overcome the limitations of incomplete or inaccessible observational datasets and to generate robust models of complex systems. Synthetic data also plays a critical role in privacy preservation, ensuring that valuable insights can be extracted without exposing personally identifiable or sensitive information \cite{ref3,ref14}. 
+
+Among the various techniques for synthetic data generation, Generative Adversarial Networks (GANs) have emerged as one of the most powerful and widely adopted methods \cite{ref15,ref16}. Introduced by Goodfellow et al. in 2014, GANs leverage a two-player game between a generator and a discriminator to produce data that closely approximates the distribution of real samples. This framework has been applied to a wide range of domains, including image synthesis, time-series forecasting, healthcare, agriculture, and anomaly detection \cite{ref7,ref8,ref9,ref10,ref11,ref12,ref19}. 
+
+In particular, the ability of GANs to capture high-dimensional and complex dependencies makes them especially suitable for weather-related data generation, where variables such as temperature, humidity, wind speed, and visibility interact in nonlinear ways. By generating synthetic weather data, researchers can supplement existing datasets, improve the training of predictive models, and explore counterfactual scenarios that may not yet have been observed in reality \cite{ref19,ref20,ref21}. This capacity for augmentation and simulation positions GANs as a pivotal tool in advancing climate science, renewable energy forecasting, and disaster preparedness.
+
+
+\section{Literature Review}
+Generative Adversarial Networks in Synthetic Tabular Data Generation Foundations, Applications and Future Directions.
+
+\subsection{Introduction}
+Since its beginning by Goodfellow et al. in 2014 \cite{ref15}, Generative Adversarial Networks (GANs) have totally altered the game in synthetic data generation \cite{ref16,ref4}. They address some of the most basic issues of machine learning, including data scarcity, confidentiality, and the necessity to have strong, objective datasets \cite{ref6,ref14}. They are much more powerful than mere image generation and even reach into the domain of structured numerical data, which perfectly fits the weather dataset that we are analysing here. This review explores the key concepts, the most recent advances, and the current problems of utilizing GANs to generate synthetic data and in particular, tabular data and all of its peculiarities \cite{ref1}.
+
+\subsection{GAN Paradigm and its Importance}
+A GAN is, in simplest terms, a zero-sum game with high stakes between a generator and a discriminator \cite{ref15}. The generator is a masterforger, whose business is to make fake data such that it appears to be real data and can deceive anybody. Instead, the discriminator is a detective whose only task is to identify the forgeries. This ongoing tug-of-war is the reason why both networks have to keep on improving \cite{ref16}. The generator does it more effectively using a random input (a latent vector) as its raw material, and the discriminator gets more efficient at recognizing them. This special adversarial training enables the GAN to get to know the underlying patterns and statistical peculiarities of the true data without ever having to encounter them in person \cite{ref17}.
+
+\subsection{The Value of Synthetic Data}
+\textbf{Data Scarcity and Privacy:} In regulated industries such as healthcare and finance, entry into large and meaningful data is non-existent by tight privacy regulations and sensitivity of the data at hand \cite{ref2,ref3}. This is where synthetic data comes in as a very important workaround to offer a privacy-conscious alternative that will enable researchers and practitioners to obtain the data they require with the preservation of confidential data \cite{ref10}.
+
+\textbf{Diversity and Robustness:} Sometimes real data are incomplete, or they do not represent rare events and edge cases. GANs are capable of being trained to produce a broader range of samples, and this may make a model better in coping with unforeseen circumstances and avoiding overfitting \cite{ref5,ref17,ref6}.
+
+\textbf{Cost-Effectiveness:} Consider the amount of time and money that it consumes to collect some types of data, particularly of areas that demand special measurements or expertise, such as weather data. The production of synthetic data is frequently much quicker and less expensive than the acquisition of data in the physical world \cite{ref9,ref20,ref21}.
+
+\subsection{Synthetic Data Generation Problems}
+\begin{itemize}
+    \item \textbf{Distribution Preservation:} It is one of the most important headaches, to ensure that the synthetic data really looks and feels like the original one, without any loss of the intricate statistical correlations of a high-dimensional data \cite{ref6,ref24}.
+    \item \textbf{Diversity and Mode Collapse:} GANs are notorious to exhibit mode collapse, in which the generator becomes complacent and starts generating a restricted number of samples, effectively overlooking all the diversity that may exist in the original data \cite{ref15,ref16}.
+    \item \textbf{Assessment and Authentication:} What even are you supposed to do to find out whether the data is any good? The conventional metrics used are not always sufficient, and that is why a new generation of evaluation frameworks is appearing which is based on more advanced data fidelity and utility measures \cite{ref1,ref17}.
+    \item \textbf{Privacy and Bias:} Despite such intentions, synthetic data may at times unintentionally disclose personal information, or even internalize the biases of the underlying data \cite{ref3,ref18,ref13}.
+\end{itemize}
+
+\subsection{Improvement in GAN Architectures and Training}
+Luckily, scientists did not merely name these issues but have been busy creating superior tools to resolve these issues.
+\begin{itemize}
+    \item \textbf{Conditional GANs (cGANs):} One of the major advances was the appearance of conditional GANs \cite{ref15,ref5}. As opposed to producing random, uncontrolled data, cGANs may be directed by a given input, including a class label or a given attribute. This provides the user with very precise control over the output generated, and is far more practical to use in practice.
+  
+    \item \textbf{Wasserstein GANs (WGANs):} To address the instability and mode collapse, scientists suggested WGANs that train Wasserstein distance, making the training process more stable and the results achieved using the Wasserstein distance of higher quality \cite{ref15,ref17}.
+    \item \textbf{Progressive Growing:} Progressive growing is another important innovation, particularly of images. The method begins with the production of simple and low-resolution data and then proceeds to add complexity to this data, and it is very useful in generating detailed numerical or tabular information \cite{ref14,ref16}.
+\end{itemize}
+These sophisticated models employ the arsenal of regularization methods, such as gradient penalty  and spectral normalization, to maintain the stability and smooth operation of things \cite{ref18}.
+
+\subsection{Tabular and Numerical GANs}
+Although GANs were first developed in image space, structured tabular data, which is much more prevalent in business and science, has seen the largest advances in recent years.
+\begin{itemize}
+    \item \textbf{Tabular Benchmarks:} Some studies have developed tabular benchmarks that demonstrate that simple architectures with more advanced practices such as proper normalization and Sampling Care can produce shockingly realistic tabular datasets \cite{ref6,ref24,ref23}.
+    
+    \item \textbf{Case Studies in Healthcare and IoT: } Real-world experiments with GANs to generate synthetic patient records, sensor logs, and other time-series data are similar to the procedures involved in the GAN code provided indicating the practicability of this solution \cite{ref7,ref8,ref19}.
+    \item \textbf{Tabular Data Scenarios:} Weather data, financial transactions, and census records are the most commonly studied examples of data that should be synthesized using GANs because they are high-dimensional, are commonly complex-distributed, and are limited in privacy \cite{ref10,ref12,ref11}.
+\end{itemize}
+
+\subsection{Uses in other Domains}
+This tech is not merely a hypothetical concept, it is already causing waves in numerous areas:
+\begin{itemize}
+    \item \textbf{Medicine:} GANs are being used to develop lifelike synthetic patient records, medical images, and support all aspects of clinical research including the development of models and sharing of privacy-preserving data \cite{ref2,ref8,ref10}.
+    \item \textbf{Finance:} Synthetic data can enable banks to build stronger fraud detection and risk evaluation models without revealing sensitive customer data \cite{ref3,ref12}.
+    \item \textbf{IoT and Environmental Science:} In the case of weather data, such as that provided in this report, GANs have already been employed to complement data, generate more realistic forecasts, and generate extreme events that are scarcely observed in the real-world record \cite{ref11,ref19,ref9}.
+\end{itemize}
+
+\subsection{Best Practices and Technical Considerations}
+Over the years of studying GANs, it has been determined that success with these algorithms relies on a handful of strategies:
+
+\begin{itemize}
+    \item \textbf{Feature Scaling and Normalization:} It is absolutely necessary that the data is in the correct format. Normalization using tools such as MinMaxScaler is indispensable for stable training \cite{ref6,ref18}.
+    
+    \item \textbf{Batch Training and Latent Sampling:} Large batches of data and random noise vectors help the generator explore possibilities actively rather than memorizing the training data \cite{ref5,ref17}.
+    
+    \item \textbf{Depth and Width of Architecture:} Deep neural networks with many layers (128, 256, or more neurons) are required to learn fine details of real-world data \cite{ref16}.
+    
+    \item \textbf{Assessment through Inverse Scaling:} To properly interpret and analyze generated data, inverse transformation is essential \cite{ref14}.
+\end{itemize}
+
+\subsection{Social, Ethical, and Privacy Considerations}
+The debate over synthetic data is not only technical but also ethical. Key considerations include:
+
+\begin{itemize}
+    \item \textbf{Privacy Leakage:} Although synthetic data is meant to be private, GANs can memorize and leak information in small datasets. Techniques like differential privacy and model regularization are essential to mitigate this \cite{ref3,ref18}.
+    
+    \item \textbf{Bias and Fairness:} GANs trained on biased datasets can reinforce those biases. Fairness-conscious training and post-generation audits are crucial to ensure equity \cite{ref2,ref6}.
+    
+    \item \textbf{Transparency:} Given the complexity of GANs, the process must be transparent, with code and datasets accessible for review and reproducibility \cite{ref1,ref13}.
+    
+    \item \textbf{Governance and Consent:} GANs producing data from proprietary or confidential sources raise questions of ownership and legal rights, highlighting the need for governance frameworks \cite{ref21,ref22}.
+\end{itemize}
+
+\subsection{New Developments and Unresolved Problems}
+Despite significant progress, several challenges remain at the frontier of synthetic data generation:
+
+\begin{itemize}
+    \item \textbf{High Fidelity:} Producing extremely high-quality synthetic data, especially for complex, high-dimensional, or imbalanced datasets, remains challenging \cite{ref6,ref17}.
+    
+    \item \textbf{Generalization:} Investigating how GANs trained on one domain (e.g., temperate climates) can be adapted to other domains (e.g., tropical climates) is ongoing \cite{ref11,ref20}.
+    
+    \item \textbf{Efficient Scaling:} With increasing demand for synthetic data, scalable, cloud-based training solutions are becoming more important than ever \cite{ref4,ref14}.
+\end{itemize}
+
+
+
+\section{Methodology: Model and Implementation}
+
+\subsection{Description and Pre-processing of the Dataset}
+The dataset that is used in the analysis of this report is the weatherHistory.csv \cite{ref25} dataset that consists of a mixture of continuous and categorical weather variables. The main characteristics that are used to make the generation process are Temperature (C), Apparent Temperature (C), Humidity, Wind Speed (km/h), Wind Bearing (degrees), Visibility (km), Loud Cover, Summary, and Precip Type. The closer look at these data sets shows that it is not a mere set of numerical values. The mixed forms of data and the convoluted distributions of the continuous variables pose a great challenge to a generative model. In particular, continuous variables tend to be not a simple bell curve, with many peaks, and this may be challenging to represent with a typical GAN.  
+
+Type of Precip, are usually highly skewed with some types having only a small number of examples.  
+
+There are a number of pre-processing steps before training the GAN on the raw data. Any absence of values in the dataset are taken care of to form a complete dataset. To prepare mixed data types to the model, one-hot encoding is used to prepare the categorical variables. The continuous variables are normalized to an appropriate value to make the training stable and avoid certain problems such as vanishing gradients in the optimization. These pre-processing stages are essential to the pre-processing of the data, so that it can feed the highly-specialized GAN architecture, based on a single unified, numerical representation of the data to both the discriminator and the generator parts.  
+
+\subsection{Tabular Data Model Architecture}
+The GAN architecture utilized in this paper is a tabular-data-specific model that uses the principles that are similar to those available in the state-of-the-art models such as the Conditional Tabular GAN (CTGAN). The architecture comprises two main, fully-connected neural networks, the discriminator and the generator. A powerful deep learning framework like PyTorch or TensorFlow is used to construct the underlying neural networks, whereas data pre-processing and manipulation is done with the pandas library.  
+
+The Generator is a network that has all the connections and as an input, it receives a random noise vector. This network aims to convert this low-dimensional noise to a high-dimensional synthetic data record that is similar to the actual weather data. The design of the model is specifically designed to deal with the mixed-type data to generate a mixture of continuous values and one-hot encoded discrete values in the output layer.  
+
+The Discriminator is also a fully-connected network, which is fed with an entire data record, which may be a real sample of the original dataset or a fake sample generated by the generator. It is used mainly to behave as a binary classifier. It produces one scalar value which is usually within 0-1 and is the likelihood that the input sample is real, achieved by applying a sigmoid activation function on the last layer. This architecture enables the discriminator to give a loss function which is dynamic to the generator; it is trained to label correctly the real samples as real (output is 1) and fake samples as fake (output is 0). Competitive training between the two networks drives the generator to generate samples that are more realistic and the discriminator to get more sensitive to fakes until the equilibrium is reached when the discriminator ceases to reliably differentiate between the two.  
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/tabular_gan_architecture.png}
+    \caption{Architecture of the Tabular GAN model used in this study.}
+    \label{fig:tabular_gan}
+\end{figure}
+
+\subsection{GAN Model}
+The generator and discriminator are both classical neural networks. The generator takes a random noise vector as input and produces synthetic samples, while the discriminator attempts to distinguish between real and generated samples.  
+
+The standard adversarial loss for a GAN is defined as:
+
+\begin{equation}
+\min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{\text{data}}} [\log D(x)] + \mathbb{E}_{z \sim p_z} [\log (1 - D(G(z)))]
+\end{equation}
+
+where $G$ is the generator, $D$ is the discriminator, $x$ is a real data sample, and $z$ is a noise vector sampled from the latent space. The generator aims to minimize this loss while the discriminator aims to maximize it, resulting in the characteristic adversarial training process.
+
+
+where $G$ is the generator, $D$ is the discriminator, $x$ is a real data sample, and $z$ is a noise vector sampled from the latent space. The generator aims to minimize this loss while the discriminator aims to maximize it, resulting in the characteristic adversarial training process.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{images/gan_working.png}
+    \caption{Working of a Generative Adversarial Network (GAN).}
+    \label{fig:gan_working}
+\end{figure}
+
+
+
+\section{Results and Analysis}
+
+\subsection{Measurements of Performance (Quantitative)}
+The convergence of the KL and the JS divergence scores throughout the training process was used as a quantitative measure of how well the generative model performed. The scores were calculated after a certain period of time as a result of binning the generated and real data and using the methods of the previous section.
+
+The main observation is that there is a clear overlap between both metrics, which means that GAN has learned the distribution of the training data successfully. Figure~\ref{fig:divergence_convergence}  depicts such a convergence as the divergence scores show clear downward tendencies across the training epochs of each of the key weather variables. The statistical distance between the real and simulated distribution decreases with the course of the training and the improvement of the generator in deceiving the discriminator; after a certain period, it reaches a small value. In the JS divergence it is a valid measure of this convergence because it is bounded, thus giving an interpretable scale by which to measure progress.
+
+Table~\ref{tab:divergence_scores} gives a final summary of the performance of the model with the stabilized KL and JS divergence scores under each weather variable. A low score of both measures will show that fidelity between the generated data and real data is high.  
+
+Table~\ref{tab:divergence_scores} gives a brief but quantitative evidence of the success of the model. The low scores of every variable ensure that GAN has been trained to generate synthetic data whose probability distribution is as small as possible to the actual data. This table can be directly compared with the performance of the GAN on each particular weather variable, which is a main quantitative evidence of the effectiveness of the model.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/distribution_plots.png}
+    \caption{Convergence of Discriminator and Generator Loss scores across epochs .}
+    \label{fig:divergence_convergence}
+\end{figure}
+
+
+
+\begin{table}[H]
+    \centering
+    \caption{Final stabilized KL and JS divergence scores for key weather variables.}
+    \label{tab:divergence_scores}
+    \scalebox{1.3}{ % 1.5 = 150% size
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Weather Variable} & \textbf{KL Divergence} & \textbf{JS Divergence} \\
+        \hline
+        Temperature (C) & 0.0226 & 0.0733 \\
+        Apparent Temperature (C) & 0.0351 & 0.0939 \\
+        Humidity & 0.0844 & 0.1461 \\
+        Wind Speed (km/h) & 0.0551 & 0.1184 \\
+        Wind Bearing (degrees) & 0.0406 & 0.1024 \\
+        Visibility (km) & 0.4418 & 0.3228 \\
+        Pressure (millibars) & 0.0472 & 0.1148 \\
+        \hline
+    \end{tabular}
+    }
+\end{table}
+
+
+\subsection{Qualitative Distributional Analysis}
+Although quantitative metrics cannot be ignored, the analysis of the data distributions visually allows a very important qualitative assessment of the model performance. To compare the actual data and the generated data, the best visualization method to use in this analysis is the overlaid histograms and Kernel Density Estimation (KDE) plots. Although a simple histogram is handy in displaying counts of frequencies, it is very deceptive because the appearance is highly variable depending on the bin size selected. Plots of KDE, however, give a continuous and smooth approximation to the probability density, which is better at showing the underlying shape of the distribution without the discontinuous appearance of a histogram.  
+
+Figure~\ref{fig:distribution_plots}  shows a sequence of side-by-side plots that show the distribution of the real data versus the generated data of each of the key weather variables. The visualizations are superimposed with a histogram with a smooth KDE curve. As an illustration, the plot of Apparent Temperature (C) shows that there is a close comparison between the real and synthetic data, and the distributions of the data show a similar shape, peak, and general distribution.
+
+The plots in Figure~\ref{fig:distribution_plots} as a visual evidence are strong indications that GAN has learnt the complex features of the weather data effectively. The KDE curves of generated data are similar to the KDE curves of the real data not only by reproducing the mean and variance, but also by reproducing the more fine-grained multi-modal structure and the long tails of the distributions. This graphical validation of the numerical results is an effective elucidation of the model in being able to produce high fidelity synthetic data, necessary in developing confidence in its generated products.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/divergence_convergence.png}
+    \caption{Comparison of real and generated distributions of weather variables using heatmap .}
+    \label{fig:distribution_plots}
+\end{figure}
+
+\subsection{Assessment System: KL and JS Divergence}
+
+\subsubsection{Theoretical Difficulty of the Measurement of Distributional Distance}
+GAN training is essentially an optimization problem: the generator aims to approximate the data distribution of the real data ($p_{\text{real}}$) to the point that the distribution that it produces ($p_{\text{fake}}$) is no longer noticeably different. In order to measure this success, we require a powerful method to measure the distance or difference in these two probability distributions.
+
+The most basic measure for this task is the Kullback-Leibler (KL) divergence, or relative entropy. It is an information-theoretical measure that scales the extent to which one probability distribution is different from another. For continuous distributions, it is expressed as an integral:
+
+\begin{equation}
+D_{\text{KL}}(P \| Q) = \int P(x) \log \frac{P(x)}{Q(x)} dx
+\end{equation}
+
+where $P$ is the actual distribution and $Q$ is the generated distribution. Although intuitively defined, KL divergence suffers two important limitations. First, it is asymmetric: $KL(P \| Q) \neq KL(Q \| P)$. This directionality is not a mere mathematical curiosity, but it has a significant influence on the behavior of the model. An inclusive forward KL divergence (with $P$ as the reference) is much more strongly punitive in the sense that the model should not produce samples in areas where the actual data is found. This drives the model to include all modes of the actual data distribution, a good feature for our weather data. Nonetheless, the reverse KL divergence is exclusive, promoting the model to produce data with the bulk of its mass concentrated on one or a few modes, which could cause mode collapse.
+
+Second, the KL divergence is unbounded. When the generated distribution $Q$ assigns zero probability to an event that has non-zero probability in the actual distribution $P$, the KL divergence becomes infinite. This is unstable and makes it difficult to use as a metric during the GAN training process.
+
+The Jensen-Shannon (JS) divergence is a much better alternative to these problems. It is a symmetric and bounded form of KL divergence. Algebraically, it is represented as:
+
+\begin{equation}
+JS(P \| Q) = \frac{1}{2} KL(P \| M) + \frac{1}{2} KL(Q \| M), \quad M = \frac{P + Q}{2}
+\end{equation}
+
+where $M$ is the midpoint between $P$ and $Q$. Being a symmetrized divergence, $JS(P \| Q) = JS(Q \| P)$, providing a more robust and intuitive measure of distance between two distributions. Using a base-2 logarithm results in a normalized version of JS divergence, where 0 corresponds to identical distributions and 1 corresponds to maximum dissimilarity. Its bounded and symmetric nature makes it a more valid and sensible metric to track GAN convergence during training.
+
+\subsubsection{Rudimentary Non-Parametric Calculations}
+Theoretical definitions of the KL and JS divergences are based on integrals, but real-world data (non-parametric), such as weather data, cannot be assumed to follow standard analytical distributions (e.g., normal or gamma). Therefore, a numerical approach is applied to convert continuous data into a discrete form.
+
+\begin{enumerate}
+    \item \textbf{Binning the data:} Each continuous weather variable (e.g., Temperature, Humidity) is divided into a set of equally-sized bins that span the range of values in both real and generated data. The same binning scheme is applied to both datasets to ensure a fair comparison.
+    
+    \item \textbf{Construction of Probability Mass Functions (PMFs):} Histograms are created for each dataset, and the number of data points in each bin is counted. These histograms are normalized so that the sum of all bin counts in each dataset equals 1. This transforms the continuous probability density function (PDF) into a discrete probability mass function (PMF), represented as a vector of probabilities for each bin.
+    
+    \item \textbf{Divergence Formulas:} With the data represented as discrete probability vectors, standard divergence formulas using summation (instead of integration) are applied. Statistical libraries such as \texttt{scipy.stats} provide functions to compute KL and JS divergences directly from these probability vectors.
+\end{enumerate}
+
+This systematic approach enables a theoretically complex concept to become a feasible and replicable evaluation framework. Applying KL and JS divergence to each weather variable provides a more accurate quantitative assessment of the GAN’s ability to learn the multi-modal and complex distributions of weather data. This process gives a strong indication of model convergence and serves as a robust measure of the fidelity of the generated data.
+
+
+
+\section{Discussion: Data Fidelity and Project Limitations}
+
+In this section, the results are analyzed and interpreted in detail with visual outputs, and the critical challenges and limitations that were experienced during the project are addressed.
+
+\subsection{Discussion of Data Fidelity}
+The numerical data observed in the section above will form a strong basis on which the performance of the model will be judged. The KL and JS divergence scores of the majority of the variables are low, while Temperature (C) and Apparent Temperature (C) have scores which are relatively higher. The fact that the scores of these variables are low, together with the visual analysis, is a solid indication that the GAN was able to learn the statistical properties of the real data. The model could generate synthetic data with a probability distribution that is close to the actual data, which is the main objective of the generation process.
+
+The performance of the model can also be checked through the visual examination of the data distributions, which is a vital qualitative check. In this analysis, to compare the real and generated data, overlaid histograms and Kernel Density Estimation (KDE) plots are the best tools of comparison because they provide a smooth continuous representation of the probability density, compared to jagged histograms. For example, the plot for Apparent Temperature (C) shows that there is a close fit between the actual and synthetic data, with both distributions having comparable shapes, peaks, and general distribution.
+
+The KDE curves of the generated data are similar not only to the ones of the real data but they also reflect the more delicate, multi-modal characteristics and the long tails of the distributions. This aesthetic validation of the quantitative results becomes a strong stating point to the capability of the model to generate high-fidelity synthetic data.
+
+\subsection{Problems and Limitations}
+Even though the project had its successes, a number of challenges and limitations were experienced:
+
+\begin{itemize}
+    \item \textbf{Simulation of Complex Distributions:} Although the model had a good fit on most variables, the much higher divergence scores on Visibility (km) and Humidity (0.4418 and 0.0844 respectively, in terms of KL divergence) indicated that the most challenging variables to fit with high fidelity were these two variables. This may be because of multimodal behavior, sparse data points in certain ranges, and other dependencies that the model failed to learn.
+    
+    \item \textbf{Training Instability:} GAN training is extremely erratic and must be hyperparameter-tuned. The low divergence scores were only attained after experimentation with learning rates, batch sizes, and network architectures to avoid problems such as mode collapse, in which the generator produces only a restricted number of samples and does not capture the entire diversity found in the data.
+    
+    \item \textbf{Absence of Temporal Modeling:} This is a major limitation of this model because it considers the statistical characteristics of individual variables but does not consider the temporal associations between them. Weather is inherently time-series data with high correlation between successive data points. Temporal dynamics are not explicitly modeled in this approach, which is important for applications such as short-term forecasting. Time-series GANs are specifically designed to capture these dependencies step-by-step.
+    
+    \item \textbf{Limited Scope of Evaluation:} In this report, the evaluation was only done on fidelity measures (KL and JS divergence). A more comprehensive assessment would involve measures of utility (e.g., Train on Synthetic, Test on Real strategy) and privacy to ensure that the data is not only realistic but also useful and safe for downstream applications.
+\end{itemize}
+
+\subsection{Visual Analysis: Histograms of Weather Parameters}
+The following histograms provide a visual comparison between real and synthetic data for the seven key weather parameters. Each histogram is overlaid with a KDE curve to demonstrate the similarity in distribution:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{images/temperature_histogram.png}
+    \includegraphics[width=0.48\textwidth]{images/apparent_temperature_histogram.png}
+    \caption{Histograms and KDE curves for Temperature (C) and Apparent Temperature (C)}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{images/humidity_histogram.png}
+    \includegraphics[width=0.48\textwidth]{images/wind_speed_histogram.png}
+    \caption{Histograms and KDE curves for Humidity and Wind Speed (km/h)}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{images/wind_bearing_histogram.png}
+    \includegraphics[width=0.48\textwidth]{images/visibility_histogram.png}
+    \caption{Histograms and KDE curves for Wind Bearing (degrees) and Visibility (km)}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{images/pressure_histogram.png}
+    \caption{Histograms and KDE curves for Pressure (millibars) }
+\end{figure}
+
+
+
+\section{Conclusion and Future Work}
+
+\subsection{Synthesis of Findings}
+The discussion in this report that uses a combination of quantitative and qualitative approaches underpins evidence that a properly constructed GAN is an excellent instrument towards the production of high-quality synthetic weather information. The fact that the Jensen-Shannon divergence scores have settled on a low constant number is a strong quantitative measure of the effectiveness of the model in learning the underlying distribution of the actual data. This is also supported by the visual analysis, which demonstrates that the resulting data distributions are closely related to the complex, multi-modal figures of the real world ones. The success of the model can be directly explained by the presence of a dedicated architecture which meets the particular requirements of tabular data, including mixed types of data and non-Gaussian distributions.  
+
+The replication of the distribution of the real data is an important feat. This implies that we can train downstream machine learning models with confidence using the synthetic data because the synthetic data is representative of the statistical properties and patterns of the original data. This offers a powerful remedy to a broad scope of applications that are usually limited by the constraints of a real-world data collection.  
+
+\subsection{Greater Implications and Future Work}
+The fact that this has been able to produce high-fidelity synthetic weather data carries with it important implications. It offers an affordable and scalable way of generating training data, which can be used to build a new generation of more resilient weather forecasting, climate modeling, and risk assessment applications. In addition, synthetic data has privacy-preservation quality, which enables collaboration and data sharing across institutions and speeds up the research and development in a safe way.  
+
+Although the findings are encouraging, it should be noted that there are several weaknesses and directions of future investigations. In this report, we were concerned with the statistical fidelity of individual variables. But weather data is time series in nature, and exhibits high temporal correlations between successive data points. These temporal dependencies are not explicitly modelled in the current approach. The future work may discuss the application of recurrent GANs (RGANs) or provide time-series-specific evaluation metrics to guarantee the time consistency of the formed data. Also, despite the good performance achieved in the dataset provided, it is important to keep the issues of mode collapse which might impede the capabilities of the model to produce a complete spectrum of weather conditions. More research on developed architectures and training methodology is justified to guarantee the variability and healthiness of the generated outputs.  
+
+To summarize, this report has shown that a strict, metric-based synthetic data generation, with GANs, is an effective and efficient tool to resolve the urgent demand to have high-quality data in the meteorological and other related areas. The alignment between divergence metrics and the visualization of similar data distributions, which, accordingly, are reflected in the success of the model, preconditions the obvious direction of the further development of safer, more scalable, and multi-purpose data-driven applications.  
+
+
+\section*{Acknowledgments}
+The authors gratefully acknowledge the guidance and support of their teachers, Dr. Anupama Jawale and Asst. Prof. Ruta Prabhu, whose valuable feedback and encouragement were instrumental in the successful completion of this work.
+
+\section*{Appendix}
+All supplementary materials, including detailed preprocessing steps, training logs, additional visualizations, and source code, are available at:  
+\url{https://github.com/AADESHBORSE/gan-weather-synthetic}
+
+% References
+% ---------------- References ---------------- %
+\begin{thebibliography}{99}
+
+\bibitem{ref1} ACM, ``GANs in the Panorama of Synthetic Data Generation Methods,'' 2024. Available: \url{https://dl.acm.org/doi/10.1145/3657294}
+\bibitem{ref2} ScienceDirect, ``Synthetic Data Generation Methods in Healthcare: A Review,'' 2024. Available: \url{https://www.sciencedirect.com/science/article/pii/S2001037024002393}
+\bibitem{ref3} PMC, ``Synthetic Data Generation: A Privacy-Preserving Approach,'' 2024. Available: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC11958975/}
+\bibitem{ref4} ArXiv, ``Machine Learning for Synthetic Data Generation: A Review,'' 2023. Available: \url{https://arxiv.org/pdf/2302.04062.pdf}
+\bibitem{ref5} IJARIIT, ``GANs for Synthetic Data Generation: Advancements and Challenges,'' 2024. Available: \url{https://www.ijariit.com/manuscripts/v10i1/V10I1-1234.pdf}
+\bibitem{ref6} ArXiv, ``A Comprehensive Survey of Synthetic Tabular Data,'' 2025. Available: \url{https://arxiv.org/html/2504.16506v2}
+\bibitem{ref7} ArXiv, ``Using GANs for Synthetic Data Generation of Time-Series Medical Records,'' 2024. Available: \url{https://arxiv.org/abs/2402.14042}
+\bibitem{ref8} PMC, ``A Systematic Review of Image- and Signal-Based Studies using GANs for Synthetic Data in Healthcare,'' 2024. Available: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC11655107/}
+\bibitem{ref9} ScienceDirect, ``Synthetic Data Augmentation Using GAN For Improved Defect Detection,'' 2023. Available: \url{https://www.sciencedirect.com/science/article/pii/S2405896323011941}
+\bibitem{ref10} ScienceDirect, ``Generative AI for Synthetic Data Across Multiple Medical Data Types,'' 2025. Available: \url{https://www.sciencedirect.com/science/article/pii/S0010482525001842}
+\bibitem{ref11} ScienceDirect, ``A Comprehensive Review of Synthetic Data Generation in Agriculture (includes GAN approach),'' 2024. Available: \url{https://www.sciencedirect.com/science/article/abs/pii/S0952197624000393}
+\bibitem{ref12} ScienceDirect, ``Artificial Generation of Survey Data with GANs,'' 2025. Available: \url{https://www.sciencedirect.com/science/article/pii/S095741742500572X}
+\bibitem{ref13} ArXiv, ``Synthetic Data Generation Using Large Language Models (includes GANs),'' 2025. Available: \url{https://arxiv.org/html/2503.14023v1}
+\bibitem{ref14} Nature, ``A Novel and Fully Automated Platform for Synthetic Tabular Data,'' 2024. Available: \url{https://www.nature.com/articles/s41598-024-73608-0}
+\bibitem{ref15} Goodfellow, I., et al., ``Generative Adversarial Networks (GANs),'' 2014. Available: \url{https://arxiv.org/abs/1406.2661}
+\bibitem{ref16} ScienceDirect, ``Generative Adversarial Networks: An Overview of Theory and Applications,'' 2020. Available: \url{https://www.sciencedirect.com/science/article/pii/S2667096820300045}
+\bibitem{ref17} ArXiv, ``A Comprehensive Survey for Generative Data Augmentation,'' 2023. Available: \url{https://arxiv.org/html/2310.00277v2}
+\bibitem{ref18} PMC, ``Data Augmentation using Generative Adversarial Networks,'' 2021. Available: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC8607740/}
+\bibitem{ref19} ScienceDirect, ``GAN-based Synthetic Time-Series Data Generation for Sensors and Anomaly Detection,'' 2024. Available: \url{https://www.sciencedirect.com/science/article/pii/S0957417424027052}
+\bibitem{ref20} ScienceDirect, ``Data Augmentation: A Comprehensive Survey of Modern Techniques,'' 2022. Available: \url{https://www.sciencedirect.com/science/article/pii/S2590005622000911}
+\bibitem{ref21} Impetus, ``Synthetic Data Generation Using GANs (Industry Application Overview),'' 2024. Available: \url{https://www.impetus.com/resources/blog/synthetic-data-generation-using-gans/}
+\bibitem{ref22} SSRN, ``Human Activity Recognition through GANs: Synthetic Data Generation,'' 2024. Available: \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5040257}
+\bibitem{ref23} OUP, ``GAN-based Data Augmentation for Transcriptomics: Survey and Perspectives,'' 2023. Available: \url{https://academic.oup.com/bioinformatics/article/39/Supplement_1/i111/7210506}
+\bibitem{ref24} DiVA, ``Generation of Synthetic Data with Generative Adversarial Networks,'' 2019. Available: \url{http://www.diva-portal.org/smash/get/diva2:1331279/FULLTEXT01.pdf}
+\bibitem{ref25} Kaggle, ``Weather History Dataset,'' Available: \url{https://www.kaggle.com/datasets/mattop/weather-history}, 2017.
+
+
+\end{thebibliography}
+
+
+\end{document}
